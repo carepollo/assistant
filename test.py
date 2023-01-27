@@ -1,6 +1,5 @@
 from terminal import Terminal
 
-
 term = Terminal()
 
 def startCommand():
