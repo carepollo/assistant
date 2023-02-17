@@ -30,8 +30,8 @@ class Terminal:
 
     def terminate(self):
         '''kill process/program and restart property value to None'''
-        self.process.kill()
-        self.process.wait()
+        self.process.terminate()
+        # self.process.wait()
         self.process = None
 
     def run_command(self, command: str):
@@ -41,5 +41,3 @@ class Terminal:
         '''
         self.write(command)
         return self.read()
-
-# output closes prematurely when a pexpect subprocess returns variable outputs
