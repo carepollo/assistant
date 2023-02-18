@@ -1,5 +1,5 @@
 from server import socketio, app
-from bot import client
+from bot import bot
 from dotenv import load_dotenv
 import os
 import multiprocessing
@@ -14,8 +14,8 @@ def start_server():
     socketio.run(app)
 
 def start_bot():
-    token = os.getenv("TOKEN")
-    client.run(token)
+    token = os.getenv("BOT_TOKEN")
+    bot.run(token)
 
 def start_multiprocess():
     queue = multiprocessing.Queue()

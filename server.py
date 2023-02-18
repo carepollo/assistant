@@ -24,6 +24,11 @@ programs_locked = Lock()
 def ping():
     return "Hello world!"
 
+@app.route("/submit", methods=["POST"])
+def submit():
+    json = request.get_json()
+    return json
+
 @socketio.on("connect")
 def handle_connect():
     print(f"{request.sid} has been connected")
