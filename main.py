@@ -2,34 +2,26 @@ from server import socketio, app
 from bot import bot
 from dotenv import load_dotenv
 import os
-import multiprocessing
-from gevent.pywsgi import WSGIServer
+import asyncio
 
 env_path = os.path.dirname(__file__) + "/.env"
 load_dotenv(env_path)
 
-def start_server():
-    http_server = WSGIServer(("127.0.0.1", 5000), socketio)
-    http_server.serve_forever()
+async def start_server():
     socketio.run(app)
 
-def start_bot():
+async def start_bot():
     token = os.getenv("BOT_TOKEN")
-    bot.run(token)
+    await bot.start(token)
 
-def start_multiprocess():
-    queue = multiprocessing.Queue()
-    bot_thread = multiprocessing.Process(name="bot_thread", target=start_bot)
-    server_thread = multiprocessing.Process(name="server_thread", target=start_server)
+async def main():
+    task1 = asyncio.create_task(start_bot())
+    task2 = asyncio.create_task(start_server())
 
-    bot_thread.start()
-    server_thread.start()
-    queue.close()
-
-def run():
-    # start_multiprocess()
-    # start_server()
-    start_bot()
-
+    await task1
+    await task2
 if __name__ == "__main__":
-    run()
+    try:
+        asyncio.run(main())
+    except KeyboardInterrupt:
+        print("Program exited")

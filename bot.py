@@ -9,21 +9,28 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 
 @bot.event
 async def on_ready():
-    print(f'We have logged in as {bot.user}')
+    print(f"Bot logged in as {bot.user}")
     
     # changing general information
     activity = discord.Game("Analysing...")
     status = discord.Status.do_not_disturb
     await bot.change_presence(activity=activity, status=status)
 
-    # automatic messages
-    userid = int(os.getenv("USER_ID"))
-    await send_dm(userid, "Automatic messages enabled")
+@bot.tree.command(name="sync", description="sycronize commands with discord")
+async def sync(interaction: discord.Interaction):
+    ownerid = os.getenv("USER_ID")
+    message = ""
 
-@bot.command()
-async def sync(ctx):
-    await bot.tree.sync()
-    await ctx.send("Syncronization succesful")
+    if interaction.user.id == int(ownerid):
+        try:
+            await bot.tree.sync()
+            message = "Syncronization succesful"
+        except Exception as e:
+            message = f"Error syncronising: {e}"
+    else:
+        message = "You are not owner of the bot"
+
+    await interaction.response.send_message(message)
 
 @bot.tree.command(name="test", description="a ping command")
 async def test(interaction: discord.Interaction):

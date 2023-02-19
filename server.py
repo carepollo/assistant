@@ -1,9 +1,10 @@
 from flask import Flask, request
 from flask_socketio import SocketIO, send, emit
 from flask_cors import CORS
-from os import path
 from terminal import Terminal
 from threading import Lock
+from bot import send_dm
+import os
 
 app = Flask(__name__)
 CORS(app)
@@ -11,9 +12,7 @@ app.config["SECRET_KEY"] = "secret"
 socketio = SocketIO(app, cors_allowed_origins="*")
 
 # setting a path to root of all projects
-root_path = path.dirname(__file__).split("/")
-root_path.pop()
-root_path = "/".join(root_path)
+root_path = os.getenv("ROOT_PATH")
 
 # keep track of executing programs and block conflicting modifications
 programs_running = {}
@@ -25,9 +24,17 @@ def ping():
     return "Hello world!"
 
 @app.route("/submit", methods=["POST"])
-def submit():
-    json = request.get_json()
-    return json
+async def submit():
+    data = request.json
+    userid = int(os.getenv("USER_ID"))
+    message = f"```Title: {data['title']}\nMessage: {data['message']}```"
+    await send_dm(userid, message)
+    return data
+
+@app.route("/notify", methods=["POST"])
+def notify():
+    message = "**someone** have just visited your portfolio"
+    return {"message": message}
 
 @socketio.on("connect")
 def handle_connect():
