@@ -204,3 +204,12 @@ Must point out that the multiprocess approach does not arises exceptions but doe
 Here is an example of what is happening in the code as a processes diagram:
 ![parallel](./parallel.png)
 `Figure 2`
+
+
+### Conclusions
+
+![assistant](./assets/hal9000.jpg)
+
+I now have an automata as my personal assitant, my secretary, this opens the gate for opportunities of integration with a bigger ecosystem of personal tasks automated or potential automatizations, but that is for the future.
+
+Be aware if you clone or fork this project, there are a lot of unused packages in the `requirements.txt` file, I recommend you filter out those that add no value to the project.

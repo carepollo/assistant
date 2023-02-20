@@ -33,8 +33,10 @@ def submit():
 
 @app.route("/notify", methods=["POST"])
 def notify():
-    message = "**someone** have just visited your portfolio"
-    shared_queue.put({"message": message, "userid": userid})
+    data = request.json
+    message = f"**{data['message']}** have just visited your portfolio"
+    notification = {"message": message, "userid": userid}
+    shared_queue.append(notification)
     return {}
 
 @socketio.on("connect")
