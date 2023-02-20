@@ -162,3 +162,45 @@ But at the time of calling the desired function on the designated endpoint, the 
 
 Using other concurrent approaches like:
 
+```py
+def start_server():
+    socketio.run(app)
+
+def start_bot():
+    token = getenv("BOT_TOKEN")
+    client.run(token)
+
+def main():
+    Thread(target=start_bot).start()
+    start_server()
+```
+
+while having a global variable to share across the app, a shared list. Then the endpoint just adds values to it and on the bot side is used the following configuration:
+```py
+def check_for_notifications():
+    while True:
+        if not len(shared_queue) == 0:
+            with notifications_lock:
+                notification = shared_queue.pop()
+                run_coroutine_threadsafe(send_dm(notification["userid"], notification["message"]), client.loop)
+
+def autmatic_bootload():
+    run(check_for_notifications())
+
+@client.event
+async def on_ready():
+    print(f"Logged in as {client.user}")
+    
+    # changing general information
+    activity = discord.Game("Analysing...")
+    status = discord.Status.do_not_disturb
+    await client.change_presence(activity=activity, status=status)
+
+    Thread(target=autmatic_bootload).start()
+```
+
+Must point out that the multiprocess approach does not arises exceptions but does not perform any action either, so in this case a child thread is created to prevent the bot from being stopped in this last step of the `on_ready` event, this thread will run a permanent task of check thread-safely with the `Lock` class if there is any pending notification to send, if so, then perform the action through a new event loop where a thrad safe coroutine is executed due to how discord.py works.
+
+Here is an example of what is happening in the code as a processes diagram:
+![parallel](./parallel.png)
+`Figure 2`

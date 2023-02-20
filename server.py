@@ -1,10 +1,10 @@
 from flask import Flask, request
-from flask_socketio import SocketIO, send, emit
+from flask_socketio import SocketIO, emit
 from flask_cors import CORS
 from terminal import Terminal
 from threading import Lock
-from bot import send_dm
-import os
+from os import getenv
+from shared import shared_queue
 
 app = Flask(__name__)
 CORS(app)
@@ -12,29 +12,30 @@ app.config["SECRET_KEY"] = "secret"
 socketio = SocketIO(app, cors_allowed_origins="*")
 
 # setting a path to root of all projects
-root_path = os.getenv("ROOT_PATH")
+root_path = getenv("ROOT_PATH")
+userid = int(getenv("USER_ID"))
 
 # keep track of executing programs and block conflicting modifications
 programs_running = {}
 programs_locked = Lock()
-
 
 @app.route("/ping")
 def ping():
     return "Hello world!"
 
 @app.route("/submit", methods=["POST"])
-async def submit():
+def submit():
     data = request.json
-    userid = int(os.getenv("USER_ID"))
     message = f"```Title: {data['title']}\nMessage: {data['message']}```"
-    await send_dm(userid, message)
+    notification = {"userid": userid, "message": message}
+    shared_queue.append(notification)
     return data
 
 @app.route("/notify", methods=["POST"])
 def notify():
     message = "**someone** have just visited your portfolio"
-    return {"message": message}
+    shared_queue.put({"message": message, "userid": userid})
+    return {}
 
 @socketio.on("connect")
 def handle_connect():
@@ -53,7 +54,7 @@ def handle_initialize(program: str):
             programs_running[request.sid] = emulator
             emit("initialize", output)
         else:
-            send("INTERNAL SERVER ERROR: Requested program is not defined")
+            emit("INTERNAL SERVER ERROR: Requested program is not defined")
 
 @socketio.on("command")
 def handle_command(command: str):
@@ -69,4 +70,3 @@ def handle_disconnect():
         
         message = f"{request.sid} has been terminated"
         print(message)
-        send(message)
