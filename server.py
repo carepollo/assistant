@@ -26,7 +26,8 @@ def ping():
 @app.route("/submit", methods=["POST"])
 def submit():
     data = request.json
-    message = f"```Title: {data['title']}\nMessage: {data['message']}```"
+    code_snippet = "```Title: {data['title']}\nMessage: {data['message']}```"
+    message = f"You have a entry from your portfolio form:\n{code_snippet}"
     notification = {"userid": userid, "message": message}
     shared_queue.append(notification)
     return data
