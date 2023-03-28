@@ -23,20 +23,12 @@ programs_locked = Lock()
 def ping():
     return "Hello world!"
 
-@app.route("/submit", methods=["POST"])
+@app.route("/notify", methods=["POST"])
 def submit():
     data = request.json
-    code_snippet = "```Title: {data['title']}\nMessage: {data['message']}```"
-    message = f"You have a entry from your portfolio form:\n{code_snippet}"
+    code_snippet = f"```Title: {data['title']}\nContact: {data['contact']}\nMessage: {data['message']}```"
+    message = f"New notification:\n{code_snippet}"
     notification = {"userid": userid, "message": message}
-    shared_queue.append(notification)
-    return data
-
-@app.route("/notify", methods=["POST"])
-def notify():
-    data = request.json
-    message = f"**{data['message']}** have just visited your portfolio"
-    notification = {"message": message, "userid": userid}
     shared_queue.append(notification)
     return {}
 

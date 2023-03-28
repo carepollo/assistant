@@ -213,3 +213,11 @@ Here is an example of what is happening in the code as a processes diagram:
 I now have an automata as my personal assitant, my secretary, this opens the gate for opportunities of integration with a bigger ecosystem of personal tasks automated or potential automatizations, but that is for the future.
 
 Be aware if you clone or fork this project, there are a lot of unused packages in the `requirements.txt` file, I recommend you filter out those that add no value to the project.
+
+### TO DO
+
+Stuff to do in the specific order given
+1. Migrate the system to a better implementation of async inter process communication with [better-ipc](https://docs.better-ipc.xyz/)
+2. Replace flask server implementation with [Quart](https://quart.palletsprojects.com/)
+3. Refactor bot implementation in order to make it scalable and extensible for future development.
+4. Implement communication commands
