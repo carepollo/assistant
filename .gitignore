@@ -1,3 +1,4 @@
 assistantvenv
 __pycache__
 .env
+fly.toml
